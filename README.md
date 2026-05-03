@@ -1,3 +1,5 @@
+![pq-ratchet](docs/og-image.jpg)
+
 # pq-ratchet
 
 [![Crates.io](https://img.shields.io/crates/v/pq-ratchet)](https://crates.io/crates/pq-ratchet)

@@ -1,0 +1,70 @@
+version: "3.8"
+
+# Adversarial test suite for pq-ratchet.
+#
+# Each service builds from a dedicated stage in Dockerfile.test and runs a
+# focused test workload.  All services share the same build context (the repo
+# root) so Docker layer caching works across them.
+#
+# Usage:
+#   docker compose -f docker-compose.adversarial.yml up --build
+# Or run a single suite:
+#   docker compose -f docker-compose.adversarial.yml run --rm adversarial
+
+services:
+
+  # ── Lint / type-check ────────────────────────────────────────────────────────
+  clippy:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: clippy-tests
+    image: pq-ratchet-clippy:latest
+    # The RUN command in the stage is the full test; this entrypoint is a no-op
+    # since the work happens at image-build time.  We re-run here so compose
+    # "up" surfaces the result in service logs.
+    command: >
+      sh -c "cargo clippy --all-features -- -D warnings"
+
+  # ── Stable integration + adversarial tests ───────────────────────────────────
+  stable:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: stable-tests
+    image: pq-ratchet-stable:latest
+    command: >
+      sh -c "cargo test --tests -- --test-threads=1"
+
+  # ── Adversarial suite only ───────────────────────────────────────────────────
+  adversarial:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: adversarial
+    image: pq-ratchet-adversarial:latest
+    command: >
+      sh -c "cargo test --test adversarial -- --test-threads=1 --nocapture"
+
+  # ── Proptest heavy (5 000 cases per property) ────────────────────────────────
+  proptest-heavy:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: proptest-heavy
+    image: pq-ratchet-proptest:latest
+    environment:
+      PROPTEST_CASES: "5000"
+    command: >
+      sh -c "cargo test --test proptest"
+
+  # ── Miri memory-safety check ─────────────────────────────────────────────────
+  miri:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: miri-tests
+    image: pq-ratchet-miri:latest
+    # Miri requires nightly and can be slow; run with a timeout in CI.
+    command: >
+      sh -c "cargo miri test --lib"

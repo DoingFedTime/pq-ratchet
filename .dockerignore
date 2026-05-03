@@ -1,0 +1,6 @@
+target/
+fuzz/corpus/
+fuzz/artifacts/
+.git/
+*.swp
+.DS_Store

@@ -1,0 +1,53 @@
+[package]
+name = "pq-ratchet"
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.82"
+description = "Post-quantum hybrid double ratchet: ML-KEM-768 + X25519 with SCKA-style epochs"
+license = "GPL-3.0-only"
+keywords = ["post-quantum", "cryptography", "ratchet", "ml-kem", "signal"]
+categories = ["cryptography"]
+repository = "https://github.com/DoingFedTime/pq-ratchet"
+homepage = "https://github.com/DoingFedTime/pq-ratchet"
+documentation = "https://docs.rs/pq-ratchet"
+readme = "README.md"
+exclude = [
+    "Dockerfile.test",
+    "docker-compose.adversarial.yml",
+    "run_adversarial_tests.sh",
+    ".dockerignore",
+    "/docs",
+    "/.github",
+    "/fuzz",
+]
+
+[dependencies]
+# NIST FIPS 203 ML-KEM-768 (post-quantum KEM)
+ml-kem = { version = "0.2", features = ["zeroize"] }
+# X25519 Diffie-Hellman (classical EC component)
+x25519-dalek = { version = "2", features = ["static_secrets", "zeroize"] }
+# HKDF key derivation
+hkdf = "0.12"
+sha2 = "0.10"
+# Secure memory wiping for all key material
+zeroize = { version = "1", features = ["derive"] }
+rand_core = "0.6"
+# Constant-time comparison for cryptographic material
+subtle = "2"
+# Error handling
+thiserror = "2"
+# Optional session-state serialization
+serde = { version = "1", optional = true }
+
+[features]
+default = []
+serde = ["dep:serde"]
+
+[dev-dependencies]
+rand = "0.8"
+proptest = "1"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "ratchet"
+harness = false

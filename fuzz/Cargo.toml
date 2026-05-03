@@ -1,0 +1,34 @@
+[package]
+name = "pq-ratchet-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+pq-ratchet = { path = ".." }
+rand_core = "0.6"
+
+# See https://github.com/rust-fuzz/cargo-fuzz for usage.
+# Run with: cargo +nightly fuzz run <target>
+
+[[bin]]
+name = "header_decode"
+path = "fuzz_targets/header_decode.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "roundtrip"
+path = "fuzz_targets/roundtrip.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "from_bytes"
+path = "fuzz_targets/from_bytes.rs"
+test = false
+doc = false

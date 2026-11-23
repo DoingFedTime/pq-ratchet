@@ -1,6 +1,6 @@
 [package]
 name = "pq-ratchet"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 rust-version = "1.82"
 description = "Post-quantum hybrid double ratchet: ML-KEM-768 + X25519 with SCKA-style epochs"
